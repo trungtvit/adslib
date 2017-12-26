@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/lnMain"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/lnMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.adslib.MainActivity">
 
-
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
+    <RelativeLayout
+        android:id="@+id/lnAds"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+        android:orientation="vertical">
+
+    </RelativeLayout>
+
 
 </LinearLayout>
