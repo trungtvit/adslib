@@ -2,8 +2,10 @@ package com.adslib;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -12,6 +14,12 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,14 +27,38 @@ public class MainActivity extends AppCompatActivity {
     RelativeLayout lnAds;
     AdBanner banner;
     AdInterstitial interstitial;
+    TextView text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         lnAds = findViewById(R.id.lnAds);
+        text = findViewById(R.id.text);
+
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("ad_key");
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                AdKey adKey = dataSnapshot.getValue(AdKey.class);
+//                if (adKey == null) {
+//                    Log.e("MainActivity", "Key data is null!");
+//                    return;
+//                }
+                Log.e("OKMEN",adKey.fb_key);
+                text.setText(adKey.fb_key);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         showBanner();
 //        showInterstitial();
+
+
     }
 
     private void showBanner() {
@@ -45,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         banner.showAd();
     }
 
-    private void showInterstitial(){
+    private void showInterstitial() {
         AdConfig bannerConfig = new AdConfig();
         AdOrder adOrder = new AdOrder();
         bannerConfig.adMobID = "ca-app-pub-3940256099942544/1033173712";
@@ -87,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(banner != null) {
+        if (banner != null) {
             banner.onBackPressed();
         }
         super.onBackPressed();

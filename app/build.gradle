@@ -27,7 +27,10 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     //////
-    compile 'com.google.android.gms:play-services-ads:11.6.0'
+    compile 'com.google.android.gms:play-services-ads:11.8.0'
     compile 'com.facebook.android:audience-network-sdk:4.+'
     compile 'com.startapp:inapp-sdk:3.6.9'
+    compile 'com.google.firebase:firebase-database:11.8.0'
 }
+
+apply plugin: 'com.google.gms.google-services'
