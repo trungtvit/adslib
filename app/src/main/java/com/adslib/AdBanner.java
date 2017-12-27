@@ -1,7 +1,7 @@
 package com.adslib;
 
 import android.app.Activity;
-import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -14,6 +14,11 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.startapp.android.publish.ads.banner.Banner;
 import com.startapp.android.publish.ads.banner.BannerListener;
 import com.startapp.android.publish.adsCommon.StartAppAd;
@@ -31,18 +36,52 @@ public class AdBanner {
     private RelativeLayout container;
     private AdConfig adConfig;
     private Activity activity;
+    private DatabaseReference mDatabase ;
 
-    public AdBanner(Activity activity, AdConfig adConfig, RelativeLayout container) {
+    public AdBanner(Activity activity, final AdConfig adConfig, RelativeLayout container) {
         this.activity = activity;
         this.adConfig = adConfig;
         this.container = container;
+
+        mDatabase= FirebaseDatabase.getInstance().getReference("ad_key");
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                AdKey adKey = dataSnapshot.getValue(AdKey.class);
+                if (adKey == null) {
+                    return;
+                }
+
+                if(adKey.ad_mob_key_banner != adConfig.adMobIDBanner){
+                    adConfig.adMobIDBanner = adKey.ad_mob_key_banner;
+                    showAdMobAd();
+                    return;
+                }
+                if(adKey.fb_key_banner != adConfig.fbIDBanner){
+                    adConfig.fbIDBanner = adKey.fb_key_banner;
+                    showFacebookAd();
+                    return;
+                }
+                if(adKey.sa_key_banner != adConfig.saIDBanner){
+                    adConfig.saIDBanner = adKey.sa_key_banner;
+                    showStartAppAd();
+                    return;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     /*Show AdMob Banner*/
     private void showAdMobAd() {
         adMobBanner = new AdView(activity);
         adMobBanner.setAdSize(AdSize.SMART_BANNER);
-        adMobBanner.setAdUnitId(adConfig.adMobID);
+        adMobBanner.setAdUnitId(adConfig.adMobIDBanner);
         adMobBanner.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
@@ -89,7 +128,7 @@ public class AdBanner {
 
     /*Show FacebookAd Banner*/
     private void showFacebookAd() {
-        fbBanner = new com.facebook.ads.AdView(activity, adConfig.fbID, com.facebook.ads
+        fbBanner = new com.facebook.ads.AdView(activity, adConfig.fbIDBanner, com.facebook.ads
                 .AdSize.BANNER_HEIGHT_50);
         AdSettings.addTestDevice(adConfig.fbTestDeviceHash);
         fbBanner.setAdListener(new com.facebook.ads.AdListener() {
@@ -146,7 +185,7 @@ public class AdBanner {
 
     /*Show StartAppAd Banner*/
     private void showStartAppAd() {
-        StartAppSDK.init(activity, adConfig.saID, true);
+        StartAppSDK.init(activity, adConfig.saIDBanner, true);
         StartAppAd.disableSplash();
         startAppAd = new StartAppAd(activity);
         saBanner = new Banner(activity);
@@ -199,6 +238,7 @@ public class AdBanner {
 
     /*Show Ad*/
     public void showAd() {
+
         if (adConfig.orderAd.getOrderAdMob() == AdOrder.FIRST) {
             showAdMobAd();
         } else if (adConfig.orderAd.getOrderFacebookAd() == AdOrder.FIRST) {

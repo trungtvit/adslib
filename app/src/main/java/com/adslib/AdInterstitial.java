@@ -1,7 +1,6 @@
 package com.adslib;
 
 import android.app.Activity;
-import android.view.View;
 import android.widget.Toast;
 
 import com.facebook.ads.Ad;
@@ -11,8 +10,11 @@ import com.facebook.ads.InterstitialAd;
 import com.facebook.ads.InterstitialAdListener;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.startapp.android.publish.ads.banner.Banner;
-import com.startapp.android.publish.ads.banner.BannerListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.startapp.android.publish.adsCommon.StartAppAd;
 import com.startapp.android.publish.adsCommon.StartAppSDK;
 import com.startapp.android.publish.adsCommon.adListeners.AdEventListener;
@@ -27,16 +29,50 @@ public class AdInterstitial {
     private StartAppAd startAppAd;
     private AdConfig adConfig;
     private Activity activity;
+    private DatabaseReference mDatabase ;
 
-    public AdInterstitial(Activity activity, AdConfig adConfig) {
+    public AdInterstitial(Activity activity,final AdConfig adConfig) {
         this.activity = activity;
         this.adConfig = adConfig;
+
+        mDatabase= FirebaseDatabase.getInstance().getReference("ad_key");
+        mDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                AdKey adKey = dataSnapshot.getValue(AdKey.class);
+                if (adKey == null) {
+                    return;
+                }
+
+                if(adKey.ad_mob_key_interstitial != adConfig.adMobIDInterstitial){
+                    adConfig.adMobIDInterstitial = adKey.ad_mob_key_interstitial;
+                    showAdMobAd();
+                    return;
+                }
+                if(adKey.fb_key_interstitial != adConfig.fbIDInterstitial){
+                    adConfig.fbIDInterstitial = adKey.fb_key_interstitial;
+                    showFacebookAd();
+                    return;
+                }
+                if(adKey.sa_key_interstitial != adConfig.saIDInterstitial){
+                    adConfig.saIDInterstitial = adKey.sa_key_interstitial;
+                    showStartAppAd();
+                    return;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    private void showAdMobAd(){
+    /*Show AdMob Interstitial*/
+    private void showAdMobAd() {
         adMobInterstitialAd = new com.google.android.gms.ads.InterstitialAd(activity);
-        adMobInterstitialAd.setAdUnitId(adConfig.adMobID);
-        adMobInterstitialAd.setAdListener(new AdListener(){
+        adMobInterstitialAd.setAdUnitId(adConfig.adMobIDInterstitial);
+        adMobInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
                 adMobInterstitialAd.show();
@@ -44,7 +80,7 @@ public class AdInterstitial {
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
-                Toast.makeText(activity,"showAdMob Fail",Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "showAdMob Fail", Toast.LENGTH_SHORT).show();
                 switch (adConfig.orderAd.getOrderAdMob()) {
                     case AdOrder.FIRST:
                         if (adConfig.orderAd.getOrderFacebookAd() == AdOrder.SECOND) {
@@ -85,8 +121,9 @@ public class AdInterstitial {
         adMobInterstitialAd.loadAd(adRequest);
     }
 
-    private void showFacebookAd(){
-        fbInterstitialAd = new InterstitialAd(activity, adConfig.fbID);
+    /*Show FacebookAd Interstitial*/
+    private void showFacebookAd() {
+        fbInterstitialAd = new InterstitialAd(activity, adConfig.fbIDInterstitial);
         AdSettings.addTestDevice(adConfig.fbTestDeviceHash);
         fbInterstitialAd.setAdListener(new InterstitialAdListener() {
             @Override
@@ -101,7 +138,7 @@ public class AdInterstitial {
 
             @Override
             public void onError(Ad ad, AdError adError) {
-                Toast.makeText(activity,"showFacebookAd Fail",Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "showFacebookAd Fail", Toast.LENGTH_SHORT).show();
                 switch (adConfig.orderAd.getOrderFacebookAd()) {
                     case AdOrder.FIRST:
                         if (adConfig.orderAd.getOrderStartAppAd() == AdOrder.SECOND) {
@@ -140,8 +177,9 @@ public class AdInterstitial {
         fbInterstitialAd.loadAd();
     }
 
-    private void showStartAppAd(){
-        StartAppSDK.init(activity, adConfig.saID, true);
+    /*Show StartAppAd Interstitial*/
+    private void showStartAppAd() {
+        StartAppSDK.init(activity, adConfig.saIDInterstitial, true);
         StartAppAd.disableSplash();
         startAppAd = new StartAppAd(activity);
         startAppAd.loadAd(new AdEventListener() {
@@ -152,7 +190,7 @@ public class AdInterstitial {
 
             @Override
             public void onFailedToReceiveAd(com.startapp.android.publish.adsCommon.Ad ad) {
-                Toast.makeText(activity,"showStartAppAd Fail",Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "showStartAppAd Fail", Toast.LENGTH_SHORT).show();
                 switch (adConfig.orderAd.getOrderStartAppAd()) {
                     case AdOrder.FIRST:
                         if (adConfig.orderAd.getOrderAdMob() == AdOrder.SECOND) {
@@ -176,7 +214,8 @@ public class AdInterstitial {
 
     }
 
-    public void showAd(){
+    /*Show Ad*/
+    public void showAd() {
         if (adConfig.orderAd.getOrderAdMob() == AdOrder.FIRST) {
             showAdMobAd();
         } else if (adConfig.orderAd.getOrderFacebookAd() == AdOrder.FIRST) {

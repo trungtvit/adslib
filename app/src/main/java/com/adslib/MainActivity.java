@@ -45,8 +45,10 @@ public class MainActivity extends AppCompatActivity {
 //                    Log.e("MainActivity", "Key data is null!");
 //                    return;
 //                }
-                Log.e("OKMEN",adKey.fb_key);
-                text.setText(adKey.fb_key);
+                Log.e("OKMEN",adKey.fb_key_banner);
+                Log.e("OKMEN1",adKey.ad_mob_key_interstitial);
+                Log.e("OKMEN2",adKey.ad_mob_key_banner);
+                text.setText(adKey.fb_key_banner);
             }
 
             @Override
@@ -55,8 +57,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        showBanner();
-//        showInterstitial();
+//        showBanner();
+        showInterstitial();
 
 
     }
@@ -64,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
     private void showBanner() {
         AdConfig bannerConfig = new AdConfig();
         AdOrder adOrder = new AdOrder();
-        bannerConfig.adMobID = "ca-app-pub-3940256099942544/6300978111";
-        bannerConfig.fbID = "YOUR_PLACEMENT_ID";
-        bannerConfig.saID = "";
+        bannerConfig.adMobIDBanner = "ca-app-pub-3940256099942544/6300978111";
+        bannerConfig.fbIDBanner = "YOUR_PLACEMENT_ID";
+        bannerConfig.saIDBanner = "";
         bannerConfig.adMobTestDeviceHash = "29CA657877FF8A5D89AFF8511D5C5E74";
         bannerConfig.fbTestDeviceHash = "dabda7d8ff5085fba05298aeb0155229";
         adOrder.setOrderAdMob(AdOrder.FIRST);
@@ -80,9 +82,9 @@ public class MainActivity extends AppCompatActivity {
     private void showInterstitial() {
         AdConfig bannerConfig = new AdConfig();
         AdOrder adOrder = new AdOrder();
-        bannerConfig.adMobID = "ca-app-pub-3940256099942544/1033173712";
-        bannerConfig.fbID = "YOUR_PLACEMENT_ID";
-        bannerConfig.saID = "Your App ID";
+        bannerConfig.adMobIDInterstitial = "ca-app-pub-3940256099942544/1033173712";
+        bannerConfig.fbIDInterstitial = "YOUR_PLACEMENT_ID";
+        bannerConfig.saIDInterstitial = "Your App ID";
         bannerConfig.adMobTestDeviceHash = "29CA657877FF8A5D89AFF8511D5C5E74";
         bannerConfig.fbTestDeviceHash = "dabda7d8ff5085fba05298aeb0155229";
         adOrder.setOrderAdMob(AdOrder.FIRST);

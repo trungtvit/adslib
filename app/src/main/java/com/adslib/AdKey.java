@@ -8,16 +8,22 @@ import com.google.firebase.database.IgnoreExtraProperties;
 @IgnoreExtraProperties
 public class AdKey {
 
-    public String ad_mob_key;
-    public String fb_key;
-    public String sa_key;
+    public String ad_mob_key_banner;
+    public String fb_key_banner;
+    public String sa_key_banner;
+    public String ad_mob_key_interstitial;
+    public String fb_key_interstitial;
+    public String sa_key_interstitial;
 
     public AdKey() {
     }
 
-    public AdKey(String ad_mob_key, String fb_key, String sa_key) {
-        this.ad_mob_key = ad_mob_key;
-        this.fb_key = fb_key;
-        this.sa_key = sa_key;
+    public AdKey(String ad_mob_key_banner, String fb_key_banner, String sa_key_banner, String ad_mob_key_interstitial, String fb_key_interstitial, String sa_key_interstitial) {
+        this.ad_mob_key_banner = ad_mob_key_banner;
+        this.fb_key_banner = fb_key_banner;
+        this.sa_key_banner = sa_key_banner;
+        this.ad_mob_key_interstitial = ad_mob_key_interstitial;
+        this.fb_key_interstitial = fb_key_interstitial;
+        this.sa_key_interstitial = sa_key_interstitial;
     }
 }
