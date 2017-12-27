@@ -1,7 +1,7 @@
 package com.adslib;
 
 import android.app.Activity;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
@@ -24,18 +24,20 @@ import com.startapp.android.publish.adsCommon.adListeners.AdEventListener;
  */
 
 public class AdInterstitial {
+    private static final String TAG = AdInterstitial.class.getSimpleName();
+
     private InterstitialAd fbInterstitialAd;
     private com.google.android.gms.ads.InterstitialAd adMobInterstitialAd;
     private StartAppAd startAppAd;
     private AdConfig adConfig;
     private Activity activity;
-    private DatabaseReference mDatabase ;
+    private DatabaseReference mDatabase;
 
-    public AdInterstitial(Activity activity,final AdConfig adConfig) {
+    public AdInterstitial(Activity activity, final AdConfig adConfig) {
         this.activity = activity;
         this.adConfig = adConfig;
 
-        mDatabase= FirebaseDatabase.getInstance().getReference("ad_key");
+        mDatabase = FirebaseDatabase.getInstance().getReference("ad_key");
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -44,17 +46,17 @@ public class AdInterstitial {
                     return;
                 }
 
-                if(adKey.ad_mob_key_interstitial != adConfig.adMobIDInterstitial){
+                if (adKey.ad_mob_key_interstitial != adConfig.adMobIDInterstitial) {
                     adConfig.adMobIDInterstitial = adKey.ad_mob_key_interstitial;
                     showAdMobAd();
                     return;
                 }
-                if(adKey.fb_key_interstitial != adConfig.fbIDInterstitial){
+                if (adKey.fb_key_interstitial != adConfig.fbIDInterstitial) {
                     adConfig.fbIDInterstitial = adKey.fb_key_interstitial;
                     showFacebookAd();
                     return;
                 }
-                if(adKey.sa_key_interstitial != adConfig.saIDInterstitial){
+                if (adKey.sa_key_interstitial != adConfig.saIDInterstitial) {
                     adConfig.saIDInterstitial = adKey.sa_key_interstitial;
                     showStartAppAd();
                     return;
@@ -80,17 +82,17 @@ public class AdInterstitial {
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
-                Toast.makeText(activity, "showAdMob Fail", Toast.LENGTH_SHORT).show();
-                switch (adConfig.orderAd.getOrderAdMob()) {
+                Log.e(TAG, "Load AdMob interstitial fail");
+                switch (adConfig.orderAdMob) {
                     case AdOrder.FIRST:
-                        if (adConfig.orderAd.getOrderFacebookAd() == AdOrder.SECOND) {
+                        if (adConfig.orderFacebookAd == AdOrder.SECOND) {
                             showFacebookAd();
                         } else {
                             showStartAppAd();
                         }
                         break;
                     case AdOrder.SECOND:
-                        if (adConfig.orderAd.getOrderFacebookAd() == AdOrder.THIRD) {
+                        if (adConfig.orderFacebookAd == AdOrder.THIRD) {
                             showFacebookAd();
                         } else {
                             showStartAppAd();
@@ -138,17 +140,17 @@ public class AdInterstitial {
 
             @Override
             public void onError(Ad ad, AdError adError) {
-                Toast.makeText(activity, "showFacebookAd Fail", Toast.LENGTH_SHORT).show();
-                switch (adConfig.orderAd.getOrderFacebookAd()) {
+                Log.e(TAG, "Load FacebookAd interstitial fail");
+                switch (adConfig.orderFacebookAd) {
                     case AdOrder.FIRST:
-                        if (adConfig.orderAd.getOrderStartAppAd() == AdOrder.SECOND) {
+                        if (adConfig.orderStartAppAd == AdOrder.SECOND) {
                             showStartAppAd();
                         } else {
                             showAdMobAd();
                         }
                         break;
                     case AdOrder.SECOND:
-                        if (adConfig.orderAd.getOrderStartAppAd() == AdOrder.THIRD) {
+                        if (adConfig.orderStartAppAd == AdOrder.THIRD) {
                             showStartAppAd();
                         } else {
                             showAdMobAd();
@@ -190,17 +192,17 @@ public class AdInterstitial {
 
             @Override
             public void onFailedToReceiveAd(com.startapp.android.publish.adsCommon.Ad ad) {
-                Toast.makeText(activity, "showStartAppAd Fail", Toast.LENGTH_SHORT).show();
-                switch (adConfig.orderAd.getOrderStartAppAd()) {
+                Log.e(TAG, "Load StartAppAd interstitial fail");
+                switch (adConfig.orderStartAppAd) {
                     case AdOrder.FIRST:
-                        if (adConfig.orderAd.getOrderAdMob() == AdOrder.SECOND) {
+                        if (adConfig.orderAdMob == AdOrder.SECOND) {
                             showAdMobAd();
                         } else {
                             showFacebookAd();
                         }
                         break;
                     case AdOrder.SECOND:
-                        if (adConfig.orderAd.getOrderAdMob() == AdOrder.THIRD) {
+                        if (adConfig.orderAdMob == AdOrder.THIRD) {
                             showAdMobAd();
                         } else {
                             showFacebookAd();
@@ -216,11 +218,11 @@ public class AdInterstitial {
 
     /*Show Ad*/
     public void showAd() {
-        if (adConfig.orderAd.getOrderAdMob() == AdOrder.FIRST) {
+        if (adConfig.orderAdMob == AdOrder.FIRST) {
             showAdMobAd();
-        } else if (adConfig.orderAd.getOrderFacebookAd() == AdOrder.FIRST) {
+        } else if (adConfig.orderFacebookAd == AdOrder.FIRST) {
             showFacebookAd();
-        } else if (adConfig.orderAd.getOrderStartAppAd() == AdOrder.FIRST) {
+        } else if (adConfig.orderStartAppAd == AdOrder.FIRST) {
             showStartAppAd();
         }
     }

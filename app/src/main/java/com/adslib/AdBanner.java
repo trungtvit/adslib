@@ -5,7 +5,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
@@ -29,6 +28,8 @@ import com.startapp.android.publish.adsCommon.StartAppSDK;
  */
 
 public class AdBanner {
+    private static final String TAG = AdBanner.class.getSimpleName();
+
     private AdView adMobBanner;
     private com.facebook.ads.AdView fbBanner;
     private Banner saBanner;
@@ -90,17 +91,17 @@ public class AdBanner {
 
             @Override
             public void onAdFailedToLoad(int i) {
-                Toast.makeText(activity,"showAdMobAd Fail",Toast.LENGTH_SHORT).show();
-                switch (adConfig.orderAd.getOrderAdMob()) {
+                Log.e(TAG,"Load AdMob banner fail");
+                switch (adConfig.orderAdMob) {
                     case AdOrder.FIRST:
-                        if (adConfig.orderAd.getOrderFacebookAd() == AdOrder.SECOND) {
+                        if (adConfig.orderFacebookAd == AdOrder.SECOND) {
                             showFacebookAd();
                         } else {
                             showStartAppAd();
                         }
                         break;
                     case AdOrder.SECOND:
-                        if (adConfig.orderAd.getOrderFacebookAd() == AdOrder.THIRD) {
+                        if (adConfig.orderFacebookAd == AdOrder.THIRD) {
                             showFacebookAd();
                         } else {
                             showStartAppAd();
@@ -149,17 +150,17 @@ public class AdBanner {
 
             @Override
             public void onError(Ad ad, AdError adError) {
-                Toast.makeText(activity,"showFacebookAd Fail",Toast.LENGTH_SHORT).show();
-                switch (adConfig.orderAd.getOrderFacebookAd()) {
+                Log.e(TAG,"Load FacebookAd banner fail");
+                switch (adConfig.orderFacebookAd) {
                     case AdOrder.FIRST:
-                        if (adConfig.orderAd.getOrderStartAppAd() == AdOrder.SECOND) {
+                        if (adConfig.orderStartAppAd == AdOrder.SECOND) {
                             showStartAppAd();
                         } else {
                             showAdMobAd();
                         }
                         break;
                     case AdOrder.SECOND:
-                        if (adConfig.orderAd.getOrderStartAppAd() == AdOrder.THIRD) {
+                        if (adConfig.orderStartAppAd == AdOrder.THIRD) {
                             showStartAppAd();
                         } else {
                             showAdMobAd();
@@ -197,17 +198,17 @@ public class AdBanner {
 
             @Override
             public void onFailedToReceiveAd(View view) {
-                Toast.makeText(activity,"showStartAppAd Fail",Toast.LENGTH_SHORT).show();
-                switch (adConfig.orderAd.getOrderStartAppAd()) {
+                Log.e(TAG,"Load StartAppAd banner fail");
+                switch (adConfig.orderStartAppAd) {
                     case AdOrder.FIRST:
-                        if (adConfig.orderAd.getOrderAdMob() == AdOrder.SECOND) {
+                        if (adConfig.orderAdMob == AdOrder.SECOND) {
                             showAdMobAd();
                         } else {
                             showFacebookAd();
                         }
                         break;
                     case AdOrder.SECOND:
-                        if (adConfig.orderAd.getOrderAdMob() == AdOrder.THIRD) {
+                        if (adConfig.orderAdMob == AdOrder.THIRD) {
                             showAdMobAd();
                         } else {
                             showFacebookAd();
@@ -239,11 +240,11 @@ public class AdBanner {
     /*Show Ad*/
     public void showAd() {
 
-        if (adConfig.orderAd.getOrderAdMob() == AdOrder.FIRST) {
+        if (adConfig.orderAdMob == AdOrder.FIRST) {
             showAdMobAd();
-        } else if (adConfig.orderAd.getOrderFacebookAd() == AdOrder.FIRST) {
+        } else if (adConfig.orderFacebookAd == AdOrder.FIRST) {
             showFacebookAd();
-        } else if (adConfig.orderAd.getOrderStartAppAd() == AdOrder.FIRST) {
+        } else if (adConfig.orderStartAppAd == AdOrder.FIRST) {
             showStartAppAd();
         }
     }
