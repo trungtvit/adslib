@@ -1,11 +1,9 @@
 package com.adslib;
 
-import com.google.firebase.database.IgnoreExtraProperties;
 
 /**
  * Created by TrungDK on 12/26/2017.
  */
-@IgnoreExtraProperties
 public class AdKey {
 
     public String ad_mob_key_banner;

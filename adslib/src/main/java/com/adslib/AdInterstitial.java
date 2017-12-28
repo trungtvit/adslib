@@ -10,11 +10,6 @@ import com.facebook.ads.InterstitialAd;
 import com.facebook.ads.InterstitialAdListener;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.startapp.android.publish.adsCommon.StartAppAd;
 import com.startapp.android.publish.adsCommon.StartAppSDK;
 import com.startapp.android.publish.adsCommon.adListeners.AdEventListener;
@@ -31,43 +26,10 @@ public class AdInterstitial {
     private StartAppAd startAppAd;
     private AdConfig adConfig;
     private Activity activity;
-    private DatabaseReference mDatabase;
 
     public AdInterstitial(Activity activity, final AdConfig adConfig) {
         this.activity = activity;
         this.adConfig = adConfig;
-
-        mDatabase = FirebaseDatabase.getInstance().getReference("ad_key");
-        mDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                AdKey adKey = dataSnapshot.getValue(AdKey.class);
-                if (adKey == null) {
-                    return;
-                }
-
-                if (adKey.ad_mob_key_interstitial != adConfig.adMobIDInterstitial) {
-                    adConfig.adMobIDInterstitial = adKey.ad_mob_key_interstitial;
-                    showAdMobAd();
-                    return;
-                }
-                if (adKey.fb_key_interstitial != adConfig.fbIDInterstitial) {
-                    adConfig.fbIDInterstitial = adKey.fb_key_interstitial;
-                    showFacebookAd();
-                    return;
-                }
-                if (adKey.sa_key_interstitial != adConfig.saIDInterstitial) {
-                    adConfig.saIDInterstitial = adKey.sa_key_interstitial;
-                    showStartAppAd();
-                    return;
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     /*Show AdMob Interstitial*/
@@ -82,7 +44,7 @@ public class AdInterstitial {
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
-                Log.e(TAG, "Load AdMob interstitial fail");
+                Log.e(TAG, "AdMob interstitial load fail");
                 switch (adConfig.orderAdMob) {
                     case AdOrder.FIRST:
                         if (adConfig.orderFacebookAd == AdOrder.SECOND) {
@@ -140,7 +102,7 @@ public class AdInterstitial {
 
             @Override
             public void onError(Ad ad, AdError adError) {
-                Log.e(TAG, "Load FacebookAd interstitial fail");
+                Log.e(TAG, "FacebookAd interstitial load fail");
                 switch (adConfig.orderFacebookAd) {
                     case AdOrder.FIRST:
                         if (adConfig.orderStartAppAd == AdOrder.SECOND) {
@@ -192,7 +154,7 @@ public class AdInterstitial {
 
             @Override
             public void onFailedToReceiveAd(com.startapp.android.publish.adsCommon.Ad ad) {
-                Log.e(TAG, "Load StartAppAd interstitial fail");
+                Log.e(TAG, "StartAppAd interstitial load fail");
                 switch (adConfig.orderStartAppAd) {
                     case AdOrder.FIRST:
                         if (adConfig.orderAdMob == AdOrder.SECOND) {
