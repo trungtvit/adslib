@@ -231,10 +231,4 @@ public class AdBanner {
             startAppAd.onPause();
     }
 
-    public void onBackPressed() {
-        if (startAppAd != null)
-            startAppAd.onBackPressed();
-    }
-
-
 }

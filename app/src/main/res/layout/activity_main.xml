@@ -16,9 +16,9 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/text"
+    <Button
+        android:id="@+id/btnShowAd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="sdfsdf" />
+        android:text="Show AD" />
 </LinearLayout>
