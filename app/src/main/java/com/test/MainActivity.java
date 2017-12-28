@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         interstitial.showAd(new AdCallBack() {
             @Override
             public void onClose() {
-                Toast.makeText(MainActivity.this, "CLOSE", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "CLOSED", Toast.LENGTH_SHORT).show();
             }
         });
     }

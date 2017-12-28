@@ -38,8 +38,6 @@ public class AdInterstitial {
         this.adConfig = adConfig;
 
         progressDialog = new ProgressDialog(activity, R.style.MyTheme);
-        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        progressDialog.getWindow().setGravity(Gravity.CENTER);
         progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
         progressDialog.setCancelable(true);
 
