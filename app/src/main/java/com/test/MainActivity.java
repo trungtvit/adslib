@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         lnAds = findViewById(R.id.lnAds);
         btnShowAd = findViewById(R.id.btnShowAd);
         mDatabase = FirebaseDatabase.getInstance().getReference("ad_key");
+
 //        showBanner();
 //        showInterstitial();
 

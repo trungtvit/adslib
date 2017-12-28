@@ -1,7 +1,10 @@
 package com.adslib;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
+import android.view.Gravity;
 
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
@@ -28,10 +31,18 @@ public class AdInterstitial {
     private AdConfig adConfig;
     private Activity activity;
     private AdCallBack adCallBack;
+    private ProgressDialog progressDialog;
 
     public AdInterstitial(Activity activity, final AdConfig adConfig) {
         this.activity = activity;
         this.adConfig = adConfig;
+
+        progressDialog = new ProgressDialog(activity, R.style.MyTheme);
+        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        progressDialog.getWindow().setGravity(Gravity.CENTER);
+        progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+        progressDialog.setCancelable(true);
+
     }
 
     /*Show AdMob Interstitial*/
@@ -41,15 +52,18 @@ public class AdInterstitial {
         AdRequest adRequest = new AdRequest.Builder().addTestDevice(adConfig.adMobTestDeviceHash)
                 .build();
         adMobInterstitialAd.loadAd(adRequest);
+
         if (adMobInterstitialAd != null) {
             adMobInterstitialAd.setAdListener(new AdListener() {
                 @Override
                 public void onAdLoaded() {
                     adMobInterstitialAd.show();
+                    dismissProgress();
                 }
 
                 @Override
                 public void onAdFailedToLoad(int errorCode) {
+                    dismissProgress();
                     Log.e(TAG, "AdMob interstitial load fail");
                     switch (adConfig.orderAdMob) {
                         case AdOrder.FIRST:
@@ -83,12 +97,14 @@ public class AdInterstitial {
 
                 @Override
                 public void onAdClosed() {
+                    dismissProgress();
                     if (adCallBack != null)
                         adCallBack.onClose();
                 }
             });
 
         } else {
+            dismissProgress();
             if (adCallBack != null)
                 adCallBack.onClose();
         }
@@ -108,12 +124,14 @@ public class AdInterstitial {
 
                 @Override
                 public void onInterstitialDismissed(Ad ad) {
+                    dismissProgress();
                     if (adCallBack != null)
                         adCallBack.onClose();
                 }
 
                 @Override
                 public void onError(Ad ad, AdError adError) {
+                    dismissProgress();
                     Log.e(TAG, "FacebookAd interstitial load fail");
                     switch (adConfig.orderFacebookAd) {
                         case AdOrder.FIRST:
@@ -138,6 +156,7 @@ public class AdInterstitial {
                 @Override
                 public void onAdLoaded(Ad ad) {
                     fbInterstitialAd.show();
+                    dismissProgress();
                 }
 
                 @Override
@@ -152,6 +171,7 @@ public class AdInterstitial {
             });
 
         } else {
+            dismissProgress();
             if (adCallBack != null)
                 adCallBack.onClose();
         }
@@ -167,10 +187,12 @@ public class AdInterstitial {
                 @Override
                 public void onReceiveAd(com.startapp.android.publish.adsCommon.Ad ad) {
                     startAppAd.showAd();
+                    dismissProgress();
                 }
 
                 @Override
                 public void onFailedToReceiveAd(com.startapp.android.publish.adsCommon.Ad ad) {
+                    dismissProgress();
                     Log.e(TAG, "StartAppAd interstitial load fail");
                     switch (adConfig.orderStartAppAd) {
                         case AdOrder.FIRST:
@@ -197,6 +219,7 @@ public class AdInterstitial {
                 @Override
                 public void adHidden(com.startapp.android.publish.adsCommon.Ad ad) {
                     adCallBack.onClose();
+                    dismissProgress();
                 }
 
                 @Override
@@ -215,6 +238,7 @@ public class AdInterstitial {
                 }
             });
         } else {
+            dismissProgress();
             if (adCallBack != null)
                 adCallBack.onClose();
         }
@@ -224,6 +248,7 @@ public class AdInterstitial {
     /*Show Ad*/
     public void showAd(AdCallBack adCallBack) {
         this.adCallBack = adCallBack;
+        showProgress();
         if (adConfig.orderAdMob == AdOrder.FIRST) {
             showAdMobAd();
         } else if (adConfig.orderFacebookAd == AdOrder.FIRST) {
@@ -246,6 +271,16 @@ public class AdInterstitial {
     public void onPause() {
         if (startAppAd != null)
             startAppAd.onPause();
+    }
+
+    private void showProgress() {
+        if (progressDialog != null)
+            progressDialog.show();
+    }
+
+    private void dismissProgress() {
+        if (progressDialog != null)
+            progressDialog.dismiss();
     }
 
 }
