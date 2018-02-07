@@ -37,12 +37,12 @@ public class MainActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference("ad_key");
 
 //        showBanner();
-//        showInterstitial();
+        initInterstitialAd();
 
         btnShowAd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showInterstitial();
+                showInterstitialAd();
             }
         });
 
@@ -92,16 +92,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showInterstitial() {
+    private void initInterstitialAd() {
         final AdConfig interstitialConfig = new AdConfig();
         interstitialConfig.adMobIDInterstitial = "ca-app-pub-3940256099942544/1033173712";
         interstitialConfig.fbIDInterstitial = "YOUR_PLACEMENT_ID";
         interstitialConfig.saIDInterstitial = "Your App ID";
         interstitialConfig.adMobTestDeviceHash = "29CA657877FF8A5D89AFF8511D5C5E74";
         interstitialConfig.fbTestDeviceHash = "dabda7d8ff5085fba05298aeb0155229";
-        interstitialConfig.orderAdMob = AdOrder.FIRST;
-        interstitialConfig.orderFacebookAd = AdOrder.THIRD;
-        interstitialConfig.orderStartAppAd = AdOrder.SECOND;
+        interstitialConfig.orderAdMob = AdOrder.SECOND;
+        interstitialConfig.orderFacebookAd = AdOrder.FIRST;
+        interstitialConfig.orderStartAppAd = AdOrder.THIRD;
         interstitial = new AdInterstitial(this, interstitialConfig);
 
         mDatabase.addValueEventListener(new ValueEventListener() {
@@ -114,33 +114,35 @@ public class MainActivity extends AppCompatActivity {
 
                 if (adKey.ad_mob_key_interstitial != interstitialConfig.adMobIDInterstitial) {
                     interstitialConfig.adMobIDInterstitial = adKey.ad_mob_key_interstitial;
-                    showAdInterstitial();
+                    interstitial.loadAd();
                     return;
                 }
                 if (adKey.fb_key_interstitial != interstitialConfig.fbIDInterstitial) {
                     interstitialConfig.fbIDInterstitial = adKey.fb_key_interstitial;
-                    showAdInterstitial();
+                    interstitial.loadAd();
                     return;
                 }
                 if (adKey.sa_key_interstitial != interstitialConfig.saIDInterstitial) {
                     interstitialConfig.saIDInterstitial = adKey.sa_key_interstitial;
-                    showAdInterstitial();
+                    interstitial.loadAd();
                     return;
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                showAdInterstitial();
+                interstitial.loadAd();
             }
         });
     }
 
-    private void showAdInterstitial() {
+
+    private void showInterstitialAd() {
         interstitial.showAd(new AdCallBack() {
             @Override
             public void onClose() {
                 Toast.makeText(MainActivity.this, "CLOSED", Toast.LENGTH_SHORT).show();
+                initInterstitialAd();
             }
         });
     }
@@ -162,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
             banner.onResume();
         if (interstitial != null)
             interstitial.onResume();
+
     }
 
     @Override
