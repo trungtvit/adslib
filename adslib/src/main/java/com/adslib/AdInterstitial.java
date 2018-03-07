@@ -293,6 +293,9 @@ public class AdInterstitial {
             showFacebookAd();
         else if (startAppAd != null && startAppAd.isReady())
             showStartAppAd();
+        else
+            if (adCallBack != null)
+                adCallBack.onClose();;
     }
 
     public void onResume() {
