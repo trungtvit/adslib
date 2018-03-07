@@ -295,7 +295,7 @@ public class AdInterstitial {
             showStartAppAd();
         else
             if (adCallBack != null)
-                adCallBack.onClose();;
+                adCallBack.onClose();
     }
 
     public void onResume() {
