@@ -34,9 +34,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         lnAds = findViewById(R.id.lnAds);
         btnShowAd = findViewById(R.id.btnShowAd);
+
+//        FirebaseDatabase.getInstance().goOnline();
         mDatabase = FirebaseDatabase.getInstance().getReference("ad_key");
 
-//        showBanner();
+        showBanner();
         initInterstitialAd();
 
         btnShowAd.setOnClickListener(new View.OnClickListener() {
@@ -55,9 +57,9 @@ public class MainActivity extends AppCompatActivity {
         bannerConfig.saIDBanner = "123";
         bannerConfig.adMobTestDeviceHash = "29CA657877FF8A5D89AFF8511D5C5E74";
         bannerConfig.fbTestDeviceHash = "dabda7d8ff5085fba05298aeb0155229";
-        bannerConfig.orderAdMob = AdOrder.THIRD;
+        bannerConfig.orderAdMob = AdOrder.FIRST;
         bannerConfig.orderFacebookAd = AdOrder.SECOND;
-        bannerConfig.orderStartAppAd = AdOrder.FIRST;
+        bannerConfig.orderStartAppAd = AdOrder.THIRD;
         banner = new AdBanner(this, bannerConfig, lnAds);
 
         mDatabase.addValueEventListener(new ValueEventListener() {
@@ -68,21 +70,17 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (adKey.ad_mob_key_banner != bannerConfig.adMobIDBanner) {
+                if (!adKey.ad_mob_key_banner.equals(bannerConfig.adMobIDBanner)) {
                     bannerConfig.adMobIDBanner = adKey.ad_mob_key_banner;
-                    banner.showAd();
-                    return;
                 }
-                if (adKey.fb_key_banner != bannerConfig.fbIDBanner) {
+                if (!adKey.fb_key_banner.equals(bannerConfig.fbIDBanner)) {
                     bannerConfig.fbIDBanner = adKey.fb_key_banner;
-                    banner.showAd();
-                    return;
                 }
-                if (adKey.sa_key_banner != bannerConfig.saIDBanner) {
+                if (!adKey.sa_key_banner.equals(bannerConfig.saIDBanner)) {
                     bannerConfig.saIDBanner = adKey.sa_key_banner;
-                    banner.showAd();
-                    return;
                 }
+                banner.showAd();
+//                FirebaseDatabase.getInstance().goOffline();
             }
 
             @Override
@@ -112,21 +110,16 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (adKey.ad_mob_key_interstitial != interstitialConfig.adMobIDInterstitial) {
+                if (!adKey.ad_mob_key_interstitial.equals(interstitialConfig.adMobIDInterstitial)) {
                     interstitialConfig.adMobIDInterstitial = adKey.ad_mob_key_interstitial;
-                    interstitial.loadAd();
-                    return;
                 }
-                if (adKey.fb_key_interstitial != interstitialConfig.fbIDInterstitial) {
+                if (!adKey.fb_key_interstitial.equals(interstitialConfig.fbIDInterstitial)) {
                     interstitialConfig.fbIDInterstitial = adKey.fb_key_interstitial;
-                    interstitial.loadAd();
-                    return;
                 }
-                if (adKey.sa_key_interstitial != interstitialConfig.saIDInterstitial) {
+                if (!adKey.sa_key_interstitial.equals(interstitialConfig.saIDInterstitial)) {
                     interstitialConfig.saIDInterstitial = adKey.sa_key_interstitial;
-                    interstitial.loadAd();
-                    return;
                 }
+                interstitial.loadAd();
             }
 
             @Override

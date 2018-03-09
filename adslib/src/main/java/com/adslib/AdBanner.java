@@ -200,7 +200,6 @@ public class AdBanner {
 
     /*Show Ad*/
     public void showAd() {
-
         if (adConfig.orderAdMob == AdOrder.FIRST) {
             showAdMobAd();
         } else if (adConfig.orderFacebookAd == AdOrder.FIRST) {
