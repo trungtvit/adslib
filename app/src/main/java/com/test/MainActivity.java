@@ -1,7 +1,9 @@
 package com.test;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     AdInterstitial interstitial;
     Button btnShowAd;
     DatabaseReference mDatabase;
+    String fbKey;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,18 +94,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    AdConfig interstitialConfig;
     private void showInterstitial() {
-        final AdConfig interstitialConfig = new AdConfig();
+          interstitialConfig = new AdConfig();
         interstitialConfig.adMobIDInterstitial = "ca-app-pub-3940256099942544/1033173712";
         interstitialConfig.fbIDInterstitial = "YOUR_PLACEMENT_ID";
         interstitialConfig.saIDInterstitial = "Your App ID";
         interstitialConfig.adMobTestDeviceHash = "29CA657877FF8A5D89AFF8511D5C5E74";
         interstitialConfig.fbTestDeviceHash = "dabda7d8ff5085fba05298aeb0155229";
-        interstitialConfig.orderAdMob = AdOrder.FIRST;
-        interstitialConfig.orderFacebookAd = AdOrder.THIRD;
+        interstitialConfig.orderAdMob = AdOrder.THIRD;
+        interstitialConfig.orderFacebookAd = AdOrder.FIRST;
         interstitialConfig.orderStartAppAd = AdOrder.SECOND;
-        interstitial = new AdInterstitial(this, interstitialConfig);
+        interstitial = new AdInterstitial(this, interstitialConfig, false);
 
         mDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -140,7 +143,13 @@ public class MainActivity extends AppCompatActivity {
         interstitial.showAd(new AdCallBack() {
             @Override
             public void onClose() {
-                Toast.makeText(MainActivity.this, "CLOSED", Toast.LENGTH_SHORT).show();
+                if(interstitial.adConfig.adsType == AdConfig.adsType.FACEBOOK){
+                    Intent intent = new Intent(MainActivity.this,TestActivity.class);
+                    intent.putExtra("KEY",interstitialConfig);
+                    startActivity(intent);
+                }else {
+                    Toast.makeText(MainActivity.this, "CLOSED", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

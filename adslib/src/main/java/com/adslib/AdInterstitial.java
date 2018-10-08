@@ -28,14 +28,16 @@ public class AdInterstitial {
     private InterstitialAd fbInterstitialAd;
     private com.google.android.gms.ads.InterstitialAd adMobInterstitialAd;
     private StartAppAd startAppAd;
-    private AdConfig adConfig;
+    public AdConfig adConfig;
     private Activity activity;
     private AdCallBack adCallBack;
     private ProgressDialog progressDialog;
+    private boolean isShowFacebook;
 
-    public AdInterstitial(Activity activity, final AdConfig adConfig) {
+    public AdInterstitial(Activity activity, final AdConfig adConfig, boolean isShowFacebook) {
         this.activity = activity;
         this.adConfig = adConfig;
+        this.isShowFacebook = isShowFacebook;
 
         progressDialog = new ProgressDialog(activity, R.style.MyTheme);
         progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
@@ -45,6 +47,7 @@ public class AdInterstitial {
 
     /*Show AdMob Interstitial*/
     private void showAdMobAd() {
+        adConfig.adsType = AdConfig.adsType.AD_MOB;
         adMobInterstitialAd = new com.google.android.gms.ads.InterstitialAd(activity);
         adMobInterstitialAd.setAdUnitId(adConfig.adMobIDInterstitial);
         AdRequest adRequest = new AdRequest.Builder().addTestDevice(adConfig.adMobTestDeviceHash)
@@ -109,67 +112,75 @@ public class AdInterstitial {
     }
 
     /*Show FacebookAd Interstitial*/
-    private void showFacebookAd() {
-        fbInterstitialAd = new InterstitialAd(activity, adConfig.fbIDInterstitial);
-        AdSettings.addTestDevice(adConfig.fbTestDeviceHash);
-        fbInterstitialAd.loadAd();
-        if (fbInterstitialAd != null) {
-            fbInterstitialAd.setAdListener(new InterstitialAdListener() {
-                @Override
-                public void onInterstitialDisplayed(Ad ad) {
-                    // Interstitial displayed callback
-                }
-
-                @Override
-                public void onInterstitialDismissed(Ad ad) {
-                    dismissProgress();
-                    if (adCallBack != null)
-                        adCallBack.onClose();
-                }
-
-                @Override
-                public void onError(Ad ad, AdError adError) {
-                    dismissProgress();
-                    Log.e(TAG, "FacebookAd interstitial load fail");
-                    switch (adConfig.orderFacebookAd) {
-                        case AdOrder.FIRST:
-                            if (adConfig.orderStartAppAd == AdOrder.SECOND) {
-                                showStartAppAd();
-                            } else {
-                                showAdMobAd();
-                            }
-                            break;
-                        case AdOrder.SECOND:
-                            if (adConfig.orderStartAppAd == AdOrder.THIRD) {
-                                showStartAppAd();
-                            } else {
-                                showAdMobAd();
-                            }
-                            break;
-                        default:
-                            break;
+    public void showFacebookAd() {
+        dismissProgress();
+        adConfig.adsType = AdConfig.adsType.FACEBOOK;
+        if(isShowFacebook) {
+            showProgress();
+            fbInterstitialAd = new InterstitialAd(activity, adConfig.fbIDInterstitial);
+            AdSettings.addTestDevice(adConfig.fbTestDeviceHash);
+            fbInterstitialAd.loadAd();
+            if (fbInterstitialAd != null) {
+                fbInterstitialAd.setAdListener(new InterstitialAdListener() {
+                    @Override
+                    public void onInterstitialDisplayed(Ad ad) {
+                        // Interstitial displayed callback
                     }
-                }
 
-                @Override
-                public void onAdLoaded(Ad ad) {
-                    fbInterstitialAd.show();
-                    dismissProgress();
-                }
+                    @Override
+                    public void onInterstitialDismissed(Ad ad) {
+                        dismissProgress();
+                        if (adCallBack != null)
+                            adCallBack.onClose();
+                    }
 
-                @Override
-                public void onAdClicked(Ad ad) {
-                    // Ad clicked callback
-                }
+                    @Override
+                    public void onError(Ad ad, AdError adError) {
+                        dismissProgress();
+                        Log.e(TAG, "FacebookAd interstitial load fail");
+                        switch (adConfig.orderFacebookAd) {
+                            case AdOrder.FIRST:
+                                if (adConfig.orderStartAppAd == AdOrder.SECOND) {
+                                    showStartAppAd();
+                                } else {
+                                    showAdMobAd();
+                                }
+                                break;
+                            case AdOrder.SECOND:
+                                if (adConfig.orderStartAppAd == AdOrder.THIRD) {
+                                    showStartAppAd();
+                                } else {
+                                    showAdMobAd();
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
 
-                @Override
-                public void onLoggingImpression(Ad ad) {
-                    // Ad impression logged callback
-                }
-            });
+                    @Override
+                    public void onAdLoaded(Ad ad) {
+                        fbInterstitialAd.show();
+                        dismissProgress();
+                    }
 
-        } else {
-            dismissProgress();
+                    @Override
+                    public void onAdClicked(Ad ad) {
+                        // Ad clicked callback
+                    }
+
+                    @Override
+                    public void onLoggingImpression(Ad ad) {
+                        // Ad impression logged callback
+                    }
+                });
+
+            } else {
+                dismissProgress();
+                if (adCallBack != null)
+                    adCallBack.onClose();
+            }
+        }else{
             if (adCallBack != null)
                 adCallBack.onClose();
         }
@@ -177,6 +188,7 @@ public class AdInterstitial {
 
     /*Show StartAppAd Interstitial*/
     private void showStartAppAd() {
+        adConfig.adsType = AdConfig.adsType.START_APP;
         StartAppSDK.init(activity, adConfig.saIDInterstitial, true);
         StartAppAd.disableSplash();
         startAppAd = new StartAppAd(activity);

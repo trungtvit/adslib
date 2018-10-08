@@ -32,9 +32,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile 'com.google.android.gms:play-services-ads:11.8.0'
-    compile 'com.facebook.android:audience-network-sdk:4.+'
-    compile 'com.startapp:inapp-sdk:3.6.9'
+    implementation 'com.google.android.gms:play-services-ads:11.8.0'
+    implementation 'com.facebook.android:audience-network-sdk:4.+'
+    implementation 'com.startapp:inapp-sdk:3.6.9'
 
 }
 
