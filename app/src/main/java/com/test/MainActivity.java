@@ -3,11 +3,9 @@ package com.test;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adslib.AdBanner;
@@ -41,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
 //        showBanner();
 //        showInterstitial();
-
+        initInterstitial();
         btnShowAd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,60 +92,69 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     AdConfig interstitialConfig;
-    private void showInterstitial() {
-          interstitialConfig = new AdConfig();
+
+    private void initInterstitial(){
+        interstitialConfig = new AdConfig();
         interstitialConfig.adMobIDInterstitial = "ca-app-pub-3940256099942544/1033173712";
         interstitialConfig.fbIDInterstitial = "YOUR_PLACEMENT_ID";
         interstitialConfig.saIDInterstitial = "Your App ID";
         interstitialConfig.adMobTestDeviceHash = "29CA657877FF8A5D89AFF8511D5C5E74";
         interstitialConfig.fbTestDeviceHash = "dabda7d8ff5085fba05298aeb0155229";
-        interstitialConfig.orderAdMob = AdOrder.THIRD;
-        interstitialConfig.orderFacebookAd = AdOrder.FIRST;
-        interstitialConfig.orderStartAppAd = AdOrder.SECOND;
+        interstitialConfig.unityGameId = "3409799";
+        interstitialConfig.orderAdMob = AdOrder.FIRST;
+        interstitialConfig.orderFacebookAd = AdOrder.THIRD;
+        interstitialConfig.orderStartAppAd = AdOrder.FOUR;
+        interstitialConfig.orderUnityAd = AdOrder.SECOND;
         interstitial = new AdInterstitial(this, interstitialConfig, false);
+    }
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                AdKey adKey = dataSnapshot.getValue(AdKey.class);
-                if (adKey == null) {
-                    return;
-                }
+    private void showInterstitial() {
 
-                if (adKey.ad_mob_key_interstitial != interstitialConfig.adMobIDInterstitial) {
-                    interstitialConfig.adMobIDInterstitial = adKey.ad_mob_key_interstitial;
-                    showAdInterstitial();
-                    return;
-                }
-                if (adKey.fb_key_interstitial != interstitialConfig.fbIDInterstitial) {
-                    interstitialConfig.fbIDInterstitial = adKey.fb_key_interstitial;
-                    showAdInterstitial();
-                    return;
-                }
-                if (adKey.sa_key_interstitial != interstitialConfig.saIDInterstitial) {
-                    interstitialConfig.saIDInterstitial = adKey.sa_key_interstitial;
-                    showAdInterstitial();
-                    return;
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                showAdInterstitial();
-            }
-        });
+        showAdInterstitial();
+//
+//        mDatabase.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                AdKey adKey = dataSnapshot.getValue(AdKey.class);
+//                if (adKey == null) {
+//                    return;
+//                }
+//
+//                if (adKey.ad_mob_key_interstitial != interstitialConfig.adMobIDInterstitial) {
+//                    interstitialConfig.adMobIDInterstitial = adKey.ad_mob_key_interstitial;
+//                    showAdInterstitial();
+//                    return;
+//                }
+//                if (adKey.fb_key_interstitial != interstitialConfig.fbIDInterstitial) {
+//                    interstitialConfig.fbIDInterstitial = adKey.fb_key_interstitial;
+//                    showAdInterstitial();
+//                    return;
+//                }
+//                if (adKey.sa_key_interstitial != interstitialConfig.saIDInterstitial) {
+//                    interstitialConfig.saIDInterstitial = adKey.sa_key_interstitial;
+//                    showAdInterstitial();
+//                    return;
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                showAdInterstitial();
+//            }
+//        });
     }
 
     private void showAdInterstitial() {
         interstitial.showAd(new AdCallBack() {
             @Override
             public void onClose() {
-                if(interstitial.adConfig.adsType == AdConfig.adsType.FACEBOOK){
-                    Intent intent = new Intent(MainActivity.this,TestActivity.class);
-                    intent.putExtra("KEY",interstitialConfig);
+                if (interstitial.adConfig.adsType == AdConfig.adsType.FACEBOOK) {
+                    Intent intent = new Intent(MainActivity.this, TestActivity.class);
+                    intent.putExtra("KEY", interstitialConfig);
                     startActivity(intent);
-                }else {
+                } else {
                     Toast.makeText(MainActivity.this, "CLOSED", Toast.LENGTH_SHORT).show();
                 }
             }

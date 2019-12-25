@@ -18,9 +18,11 @@ public class AdConfig implements Parcelable{
     public String saIDInterstitial;
     public String adMobTestDeviceHash;
     public String fbTestDeviceHash;
+    public String unityGameId;
     public int orderAdMob;
     public int orderFacebookAd;
     public int orderStartAppAd;
+    public int orderUnityAd;
 
     protected AdConfig(Parcel in) {
         adMobIDBanner = in.readString();
@@ -31,9 +33,11 @@ public class AdConfig implements Parcelable{
         saIDInterstitial = in.readString();
         adMobTestDeviceHash = in.readString();
         fbTestDeviceHash = in.readString();
+        unityGameId = in.readString();
         orderAdMob = in.readInt();
         orderFacebookAd = in.readInt();
         orderStartAppAd = in.readInt();
+        orderUnityAd = in.readInt();
     }
 
     public AdConfig() {
@@ -66,15 +70,18 @@ public class AdConfig implements Parcelable{
         dest.writeString(saIDInterstitial);
         dest.writeString(adMobTestDeviceHash);
         dest.writeString(fbTestDeviceHash);
+        dest.writeString(unityGameId);
         dest.writeInt(orderAdMob);
         dest.writeInt(orderFacebookAd);
         dest.writeInt(orderStartAppAd);
+        dest.writeInt(orderUnityAd);
     }
 
     public enum adsType {
         FACEBOOK,
         AD_MOB,
-        START_APP
+        START_APP,
+        UNITY_ADS
     }
 
 }
