@@ -14,8 +14,10 @@ public class AdConfig {
     public String saIDInterstitial;
     public String adMobTestDeviceHash;
     public String fbTestDeviceHash;
+    public String unityGameId;
     public int orderAdMob;
     public int orderFacebookAd;
     public int orderStartAppAd;
+    public int orderUnityAd;
 
 }

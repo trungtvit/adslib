@@ -97,9 +97,11 @@ public class MainActivity extends AppCompatActivity {
         interstitialConfig.saIDInterstitial = "Your App ID";
         interstitialConfig.adMobTestDeviceHash = "29CA657877FF8A5D89AFF8511D5C5E74";
         interstitialConfig.fbTestDeviceHash = "dabda7d8ff5085fba05298aeb0155229";
+        interstitialConfig.unityGameId = "3409799";
         interstitialConfig.orderAdMob = AdOrder.SECOND;
-        interstitialConfig.orderFacebookAd = AdOrder.FIRST;
+        interstitialConfig.orderFacebookAd = AdOrder.FOUR;
         interstitialConfig.orderStartAppAd = AdOrder.THIRD;
+        interstitialConfig.orderUnityAd = AdOrder.FIRST;
         interstitial = new AdInterstitial(this, interstitialConfig);
 
         mDatabase.addValueEventListener(new ValueEventListener() {

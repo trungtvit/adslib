@@ -35,6 +35,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:11.8.0'
     compile 'com.facebook.android:audience-network-sdk:4.+'
     compile 'com.startapp:inapp-sdk:3.6.9'
+    implementation project(path: ':unity-ads')
 
 }
 

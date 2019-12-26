@@ -17,6 +17,8 @@ import com.startapp.android.publish.adsCommon.StartAppAd;
 import com.startapp.android.publish.adsCommon.StartAppSDK;
 import com.startapp.android.publish.adsCommon.adListeners.AdDisplayListener;
 import com.startapp.android.publish.adsCommon.adListeners.AdEventListener;
+import com.unity3d.ads.IUnityAdsListener;
+import com.unity3d.ads.UnityAds;
 
 /**
  * Created by TrungTV on 12/26/2017.
@@ -31,6 +33,7 @@ public class AdInterstitial {
     private AdConfig adConfig;
     private Activity activity;
     private AdCallBack adCallBack;
+    private String placementId = "video"; // placementId có 4 loại : ddd,video,rewardedVideo,game.
 
     public AdInterstitial(Activity activity, final AdConfig adConfig) {
         this.activity = activity;
@@ -54,6 +57,8 @@ public class AdInterstitial {
                         case AdOrder.FIRST:
                             if (adConfig.orderFacebookAd == AdOrder.SECOND) {
                                 loadFacebookAd();
+                            } else if (adConfig.orderUnityAd == AdOrder.SECOND) {
+                                loadUnityAds();
                             } else {
                                 loadStartAppAd();
                             }
@@ -61,6 +66,17 @@ public class AdInterstitial {
                         case AdOrder.SECOND:
                             if (adConfig.orderFacebookAd == AdOrder.THIRD) {
                                 showFacebookAd();
+                            } else if (adConfig.orderUnityAd == AdOrder.THIRD) {
+                                loadUnityAds();
+                            } else {
+                                loadStartAppAd();
+                            }
+                            break;
+                        case AdOrder.THIRD:
+                            if (adConfig.orderFacebookAd == AdOrder.FOUR) {
+                                loadFacebookAd();
+                            } else if (adConfig.orderUnityAd == AdOrder.FOUR) {
+                                loadUnityAds();
                             } else {
                                 loadStartAppAd();
                             }
@@ -116,6 +132,8 @@ public class AdInterstitial {
                         case AdOrder.FIRST:
                             if (adConfig.orderStartAppAd == AdOrder.SECOND) {
                                 loadStartAppAd();
+                            } else if (adConfig.orderUnityAd == AdOrder.SECOND) {
+                                loadUnityAds();
                             } else {
                                 loadAdModAd();
                             }
@@ -123,8 +141,19 @@ public class AdInterstitial {
                         case AdOrder.SECOND:
                             if (adConfig.orderStartAppAd == AdOrder.THIRD) {
                                 loadStartAppAd();
+                            } else if (adConfig.orderUnityAd == AdOrder.THIRD) {
+                                loadUnityAds();
                             } else {
                                 loadAdModAd();
+                            }
+                            break;
+                        case AdOrder.THIRD:
+                            if (adConfig.orderStartAppAd == AdOrder.FOUR) {
+                                loadFacebookAd();
+                            } else if (adConfig.orderUnityAd == AdOrder.FOUR) {
+                                loadUnityAds();
+                            } else {
+                                loadStartAppAd();
                             }
                             break;
                         default:
@@ -218,6 +247,8 @@ public class AdInterstitial {
                         case AdOrder.FIRST:
                             if (adConfig.orderAdMob == AdOrder.SECOND) {
                                 loadAdModAd();
+                            } else if (adConfig.orderUnityAd == AdOrder.SECOND) {
+                                loadUnityAds();
                             } else {
                                 loadFacebookAd();
                             }
@@ -225,8 +256,19 @@ public class AdInterstitial {
                         case AdOrder.SECOND:
                             if (adConfig.orderAdMob == AdOrder.THIRD) {
                                 loadAdModAd();
+                            } else if (adConfig.orderUnityAd == AdOrder.THIRD) {
+                                loadUnityAds();
                             } else {
                                 loadFacebookAd();
+                            }
+                            break;
+                        case AdOrder.THIRD:
+                            if (adConfig.orderAdMob == AdOrder.FOUR) {
+                                loadAdModAd();
+                            } else if (adConfig.orderUnityAd == AdOrder.FOUR) {
+                                loadUnityAds();
+                            } else {
+                                loadStartAppAd();
                             }
                             break;
                         default:
@@ -273,6 +315,19 @@ public class AdInterstitial {
 
     }
 
+    /*Load Unity Ads Interstitial*/
+    private void loadUnityAds() {
+        UnityAds.initialize(activity, adConfig.unityGameId, null, true);
+        UnityAds.setListener(new UnityAdsListener());
+    }
+
+    /*Show Unity Ads Interstitial*/
+    private void showUnityAds() {
+        if (UnityAds.isReady(placementId)) {
+            UnityAds.show(activity, placementId);
+        }
+    }
+
     /*Load Ad*/
     public void loadAd() {
         if (adConfig.orderAdMob == AdOrder.FIRST) {
@@ -281,6 +336,8 @@ public class AdInterstitial {
             loadFacebookAd();
         } else if (adConfig.orderStartAppAd == AdOrder.FIRST) {
             loadStartAppAd();
+        } else if (adConfig.orderUnityAd == AdOrder.FIRST) {
+            loadUnityAds();
         }
     }
 
@@ -293,9 +350,10 @@ public class AdInterstitial {
             showFacebookAd();
         else if (startAppAd != null && startAppAd.isReady())
             showStartAppAd();
-        else
-            if (adCallBack != null)
-                adCallBack.onClose();
+        else if (UnityAds.isReady(placementId))
+            showUnityAds();
+        else if (adCallBack != null)
+            adCallBack.onClose();
     }
 
     public void onResume() {
@@ -311,5 +369,60 @@ public class AdInterstitial {
     public void onPause() {
         if (startAppAd != null)
             startAppAd.onPause();
+    }
+
+    private class UnityAdsListener implements IUnityAdsListener {
+        @Override
+        public void onUnityAdsReady(String s) {
+            Log.e(TAG, "onUnityAdsReady " + s);
+        }
+
+        @Override
+        public void onUnityAdsStart(String s) {
+            Log.e(TAG, "onUnityAdsStart");
+        }
+
+        @Override
+        public void onUnityAdsFinish(String s, UnityAds.FinishState finishState) {
+            Log.e(TAG, "onUnityAdsFinish");
+            if (adCallBack != null)
+                adCallBack.onClose();
+        }
+
+        @Override
+        public void onUnityAdsError(UnityAds.UnityAdsError unityAdsError, String s) {
+            Log.e(TAG, "UnityAds interstitial load fail " + s);
+            switch (adConfig.orderUnityAd) {
+                case AdOrder.FIRST:
+                    if (adConfig.orderStartAppAd == AdOrder.SECOND) {
+                        showStartAppAd();
+                    } else if (adConfig.orderFacebookAd == AdOrder.SECOND) {
+                        showFacebookAd();
+                    } else {
+                        showAdMobAd();
+                    }
+                    break;
+                case AdOrder.SECOND:
+                    if (adConfig.orderStartAppAd == AdOrder.THIRD) {
+                        showStartAppAd();
+                    } else if (adConfig.orderFacebookAd == AdOrder.THIRD) {
+                        showFacebookAd();
+                    } else {
+                        showAdMobAd();
+                    }
+                    break;
+                case AdOrder.THIRD:
+                    if (adConfig.orderStartAppAd == AdOrder.FOUR) {
+                        showStartAppAd();
+                    } else if (adConfig.orderFacebookAd == AdOrder.FOUR) {
+                        showFacebookAd();
+                    } else {
+                        showAdMobAd();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
