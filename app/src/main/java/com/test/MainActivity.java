@@ -5,20 +5,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adslib.AdBanner;
 import com.adslib.AdCallBack;
 import com.adslib.AdConfig;
 import com.adslib.AdInterstitial;
-import com.adslib.AdKey;
 import com.adslib.AdOrder;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,7 +19,6 @@ public class MainActivity extends AppCompatActivity {
     AdBanner banner;
     AdInterstitial interstitial;
     Button btnShowAd;
-    DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +26,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         lnAds = findViewById(R.id.lnAds);
         btnShowAd = findViewById(R.id.btnShowAd);
-
-//        FirebaseDatabase.getInstance().goOnline();
-        mDatabase = FirebaseDatabase.getInstance().getReference("ad_key");
 
         showBanner();
         initInterstitialAd();
@@ -61,33 +50,7 @@ public class MainActivity extends AppCompatActivity {
         bannerConfig.orderFacebookAd = AdOrder.SECOND;
         bannerConfig.orderStartAppAd = AdOrder.THIRD;
         banner = new AdBanner(this, bannerConfig, lnAds);
-
-        mDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                AdKey adKey = dataSnapshot.getValue(AdKey.class);
-                if (adKey == null) {
-                    return;
-                }
-
-                if (!adKey.ad_mob_key_banner.equals(bannerConfig.adMobIDBanner)) {
-                    bannerConfig.adMobIDBanner = adKey.ad_mob_key_banner;
-                }
-                if (!adKey.fb_key_banner.equals(bannerConfig.fbIDBanner)) {
-                    bannerConfig.fbIDBanner = adKey.fb_key_banner;
-                }
-                if (!adKey.sa_key_banner.equals(bannerConfig.saIDBanner)) {
-                    bannerConfig.saIDBanner = adKey.sa_key_banner;
-                }
-                banner.showAd();
-//                FirebaseDatabase.getInstance().goOffline();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                banner.showAd();
-            }
-        });
+        banner.showAd();
     }
 
     private void initInterstitialAd() {
@@ -103,32 +66,8 @@ public class MainActivity extends AppCompatActivity {
         interstitialConfig.orderStartAppAd = AdOrder.THIRD;
         interstitialConfig.orderUnityAd = AdOrder.FIRST;
         interstitial = new AdInterstitial(this, interstitialConfig);
+        interstitial.loadAd();
 
-        mDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                AdKey adKey = dataSnapshot.getValue(AdKey.class);
-                if (adKey == null) {
-                    return;
-                }
-
-                if (!adKey.ad_mob_key_interstitial.equals(interstitialConfig.adMobIDInterstitial)) {
-                    interstitialConfig.adMobIDInterstitial = adKey.ad_mob_key_interstitial;
-                }
-                if (!adKey.fb_key_interstitial.equals(interstitialConfig.fbIDInterstitial)) {
-                    interstitialConfig.fbIDInterstitial = adKey.fb_key_interstitial;
-                }
-                if (!adKey.sa_key_interstitial.equals(interstitialConfig.saIDInterstitial)) {
-                    interstitialConfig.saIDInterstitial = adKey.sa_key_interstitial;
-                }
-                interstitial.loadAd();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                interstitial.loadAd();
-            }
-        });
     }
 
 
